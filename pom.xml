@@ -85,10 +85,12 @@
     <distributionManagement>
         <repository>
             <id>releases</id>
+            <name>maven-releases</name>
             <url>http://nexus.aegisa.cn/repository/maven-releases/</url>
         </repository>
         <snapshotRepository>
             <id>snapshots</id>
+            <name>maven-snapshots</name>
             <url>http://nexus.aegisa.cn/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
