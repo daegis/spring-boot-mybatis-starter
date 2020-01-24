@@ -1,8 +1,8 @@
 package cn.aegisa.spring.boot.mybatis;
 
-import com.alibaba.druid.pool.DruidDataSource;
 import cn.aegisa.spring.boot.mybatis.component.service.impl.CommonServiceImpl;
 import cn.aegisa.spring.boot.mybatis.component.spi.impl.CommonDaoImpl;
+import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -38,16 +38,7 @@ import java.util.Objects;
 public class MybatisAutoConfiguration {
 
     private final String DRIVER_CLASS_NAME = "com.mysql.jdbc.Driver";
-    private final Integer INITIAL_SIZE = 10;
-    private final Integer MIN_IDLE = 10;
-    private final Integer MAX_ACTIVE = 200;
-    private final Long MAX_WAIT = 60000L;
-    private final Long TIMEBETWEENEVICTIONRUNSMILLIS = 60000L;
-    private final Long MINEVICTABLEIDLETIMEMILLIS = 300000L;
     private final String VALIDATION_QUERY = "SELECT now()";
-    private final Boolean TESTWHILEIDLE = true;
-    private final Boolean TESTONBORROW = false;
-    private final Boolean TESTONRETURN = false;
     private final String MAPPER_LOCATION = "mybatis/mapper/*.xml";
     private final String MAPPER_CONFIG = "mybatis/sql-map-config.xml";
 
@@ -63,25 +54,17 @@ public class MybatisAutoConfiguration {
         return map;
     }
 
-    private DruidDataSource parentDatasource(MybatisProperties properties) {
-        final DruidDataSource druid = new DruidDataSource();
-        druid.setDriverClassName(properties.getDriverClassName() == null ? DRIVER_CLASS_NAME : properties.getDriverClassName());
-        druid.setInitialSize(properties.getInitialSize() == null ? INITIAL_SIZE : properties.getInitialSize());
-        druid.setMinIdle(properties.getMinIdle() == null ? MIN_IDLE : properties.getMinIdle());
-        druid.setMaxActive(properties.getMaxActive() == null ? MAX_ACTIVE : properties.getMaxActive());
-        druid.setMaxWait(properties.getMaxWait() == null ? MAX_WAIT : properties.getMaxWait());
-        druid.setTimeBetweenEvictionRunsMillis(properties.getTimeBetweenEvictionRunsMillis() == null ? TIMEBETWEENEVICTIONRUNSMILLIS : properties.getTimeBetweenEvictionRunsMillis());
-        druid.setMinEvictableIdleTimeMillis(properties.getMinEvictableIdleTimeMillis() == null ? MINEVICTABLEIDLETIMEMILLIS : properties.getMinEvictableIdleTimeMillis());
-        druid.setValidationQuery(properties.getValidationQuery() == null ? VALIDATION_QUERY : properties.getValidationQuery());
-        druid.setTestWhileIdle(properties.getTestWhileIdle() == null ? TESTWHILEIDLE : properties.getTestWhileIdle());
-        druid.setTestOnBorrow(properties.getTestOnBorrow() == null ? TESTONBORROW : properties.getTestOnBorrow());
-        druid.setTestOnReturn(properties.getTestOnReturn() == null ? TESTONRETURN : properties.getTestOnReturn());
-        return druid;
+    private HikariDataSource parentDatasource(MybatisProperties properties) {
+        final HikariDataSource hikari = new HikariDataSource();
+        hikari.setDriverClassName(properties.getDriverClassName() == null ? DRIVER_CLASS_NAME : properties.getDriverClassName());
+        hikari.setReadOnly(false);
+        hikari.setConnectionTestQuery(VALIDATION_QUERY);
+        return hikari;
     }
 
     private DataSource getDataSource(String dbUrl_slave, String username_slave, String password_slave, MybatisProperties properties) {
-        final DruidDataSource dataSource = parentDatasource(properties);
-        dataSource.setUrl(dbUrl_slave);
+        final HikariDataSource dataSource = parentDatasource(properties);
+        dataSource.setJdbcUrl(dbUrl_slave);
         dataSource.setUsername(username_slave);
         dataSource.setPassword(password_slave);
         return dataSource;
