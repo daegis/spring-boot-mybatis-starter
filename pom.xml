@@ -10,7 +10,7 @@
     </parent>
     <groupId>cn.aegisa.spring.boot</groupId>
     <artifactId>spring-boot-mybatis-starter</artifactId>
-    <version>3.1.2</version>
+    <version>4.0.0-SNAPSHOT</version>
     <name>spring-boot-mybatis-starter</name>
     <description>Mybatis Integrated Component</description>
 
